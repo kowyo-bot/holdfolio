@@ -1,15 +1,15 @@
-import pg from "pg";
+import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 
 import { env } from "@/lib/env";
 
 const globalForDb = globalThis as unknown as {
-  __pool?: pg.Pool;
+  __pool?: Pool;
 };
 
 const pool =
   globalForDb.__pool ??
-  new pg.Pool({
+  new Pool({
     connectionString: env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
     max: 5,
