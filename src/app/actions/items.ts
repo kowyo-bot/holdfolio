@@ -18,6 +18,7 @@ const ymd = z
 const createItemSchema = z.object({
   name: z.string().trim().min(1).max(200),
   acquiredAt: ymd,
+  endedAt: ymd,
   cost: z.string().trim().optional(),
 });
 
@@ -29,6 +30,7 @@ export async function createItem(input: z.infer<typeof createItemSchema>) {
     userId: session.user.id,
     name: data.name,
     acquiredAt: data.acquiredAt ?? null,
+    endedAt: data.endedAt ?? null,
     costCents: parseMoneyToCents(data.cost ?? ""),
   });
 
@@ -39,6 +41,7 @@ const updateItemSchema = z.object({
   id: z.string().uuid(),
   name: z.string().trim().min(1).max(200),
   acquiredAt: ymd,
+  endedAt: ymd,
   cost: z.string().trim().optional(),
 });
 
@@ -51,6 +54,7 @@ export async function updateItem(input: z.infer<typeof updateItemSchema>) {
     .set({
       name: data.name,
       acquiredAt: data.acquiredAt ?? null,
+      endedAt: data.endedAt ?? null,
       costCents: parseMoneyToCents(data.cost ?? ""),
       updatedAt: new Date(),
     })

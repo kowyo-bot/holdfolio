@@ -29,11 +29,14 @@ export function ImportCard() {
             {
               name: "AirPods Pro",
               acquiredAt: "2025-10-12",
+              endedAt: null,
               cost: "249.00",
-              uses: [
-                { usedAt: "2026-02-01", quantity: 1 },
-                { usedAt: "2026-02-02", quantity: 2 },
-              ],
+              dailyUsesTotal: 70,
+              // Or provide explicit uses:
+              // uses: [
+              //   { usedAt: "2026-02-01", quantity: 1 },
+              //   { usedAt: "2026-02-02", quantity: 2 },
+              // ],
             },
           ],
         },

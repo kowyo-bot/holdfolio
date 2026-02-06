@@ -16,6 +16,7 @@ export const items = pgTable(
 
     name: text("name").notNull(),
     acquiredAt: date("acquired_at"),
+    endedAt: date("ended_at"),
     costCents: integer("cost_cents").notNull().default(0),
 
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -28,6 +29,7 @@ export const items = pgTable(
   (t) => ({
     userIdIdx: index("items_user_id_idx").on(t.userId),
     acquiredAtIdx: index("items_acquired_at_idx").on(t.acquiredAt),
+    endedAtIdx: index("items_ended_at_idx").on(t.endedAt),
   })
 );
 

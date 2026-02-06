@@ -8,6 +8,7 @@ export type ItemMetricsRow = {
   id: string;
   name: string;
   acquiredAt: string | null;
+  endedAt: string | null;
   costCents: number;
   uses: number;
 };
@@ -23,6 +24,7 @@ export async function listItemsWithMetrics(params: {
       id: items.id,
       name: items.name,
       acquiredAt: items.acquiredAt,
+      endedAt: items.endedAt,
       costCents: items.costCents,
       uses: sql<number>`coalesce(sum(${itemUses.quantity}), 0)`.mapWith(Number),
     })
@@ -32,7 +34,15 @@ export async function listItemsWithMetrics(params: {
       and(
         eq(itemUses.itemId, items.id),
         eq(itemUses.userId, userId),
-        lte(itemUses.usedAt, asOfDate)
+        // If an item has endedAt, don't count uses after min(endedAt, asOfDate).
+        lte(
+          itemUses.usedAt,
+          sql`case
+            when ${items.endedAt} is null then ${asOfDate}
+            when ${items.endedAt} > ${asOfDate} then ${asOfDate}
+            else ${items.endedAt}
+          end`
+        )
       )
     )
     .where(eq(items.userId, userId))

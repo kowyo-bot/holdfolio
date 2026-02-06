@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-
-type ColMeta = { className?: string };
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+
+type ColMeta = { className?: string };
 import { formatISO } from "date-fns";
 import { toast } from "sonner";
 
@@ -44,6 +44,7 @@ export type ItemRow = {
   id: string;
   name: string;
   acquiredAt: string | null;
+  endedAt: string | null;
   holdingDays: number | null;
   costCents: number;
   uses: number;
@@ -56,6 +57,7 @@ function EditItemDialog(props: { item: ItemRow }) {
 
   const [name, setName] = useState(props.item.name);
   const [acquiredAt, setAcquiredAt] = useState(props.item.acquiredAt ?? "");
+  const [endedAt, setEndedAt] = useState(props.item.endedAt ?? "");
   const [cost, setCost] = useState(String((props.item.costCents / 100).toFixed(2)));
 
   return (
@@ -89,6 +91,15 @@ function EditItemDialog(props: { item: ItemRow }) {
             />
           </div>
           <div className="grid gap-2">
+            <Label htmlFor={`ended-${props.item.id}`}>End date</Label>
+            <Input
+              id={`ended-${props.item.id}`}
+              type="date"
+              value={endedAt}
+              onChange={(e) => setEndedAt(e.target.value)}
+            />
+          </div>
+          <div className="grid gap-2">
             <Label htmlFor={`cost-${props.item.id}`}>Cost</Label>
             <Input
               id={`cost-${props.item.id}`}
@@ -109,6 +120,7 @@ function EditItemDialog(props: { item: ItemRow }) {
                     id: props.item.id,
                     name,
                     acquiredAt: acquiredAt || undefined,
+                    endedAt: endedAt || undefined,
                     cost,
                   });
                   toast.success("Item updated");
@@ -196,9 +208,14 @@ export function ItemsTable(props: { data: ItemRow[] }) {
         meta: { className: "hidden sm:table-cell" } satisfies ColMeta,
       },
       {
+        accessorKey: "endedAt",
+        header: "End",
+        meta: { className: "hidden md:table-cell" } satisfies ColMeta,
+      },
+      {
         accessorKey: "holdingDays",
         header: "Holding days",
-        meta: { className: "hidden md:table-cell" } satisfies ColMeta,
+        meta: { className: "hidden lg:table-cell" } satisfies ColMeta,
       },
       { accessorKey: "uses", header: "Uses" },
       {

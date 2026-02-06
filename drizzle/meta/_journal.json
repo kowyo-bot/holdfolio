@@ -8,6 +8,13 @@
       "when": 1770271429429,
       "tag": "0000_greedy_domino",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770347580288,
+      "tag": "0001_curly_sauron",
+      "breakpoints": true
     }
   ]
 }

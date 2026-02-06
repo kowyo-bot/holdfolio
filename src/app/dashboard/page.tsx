@@ -30,9 +30,16 @@ export default async function DashboardPage(props: {
 
   const itemsForTable: ItemRow[] = rows.map((r) => {
     const acquired = r.acquiredAt ? new Date(`${r.acquiredAt}T00:00:00Z`) : null;
+    const ended = r.endedAt ? new Date(`${r.endedAt}T00:00:00Z`) : null;
     const asOfDate = new Date(`${asOf}T00:00:00Z`);
+
+    const effectiveEnd = ended && ended < asOfDate ? ended : asOfDate;
+
     const holdingDays = acquired
-      ? Math.max(0, Math.floor((asOfDate.getTime() - acquired.getTime()) / (1000 * 60 * 60 * 24)))
+      ? Math.max(
+          0,
+          Math.floor((effectiveEnd.getTime() - acquired.getTime()) / (1000 * 60 * 60 * 24))
+        )
       : null;
 
     const uses = Number(r.uses ?? 0);
@@ -42,6 +49,7 @@ export default async function DashboardPage(props: {
       id: r.id,
       name: r.name,
       acquiredAt: r.acquiredAt,
+      endedAt: r.endedAt,
       holdingDays,
       costCents: r.costCents,
       uses,

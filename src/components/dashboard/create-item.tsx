@@ -22,6 +22,7 @@ export function CreateItemDialog() {
 
   const [name, setName] = useState("");
   const [acquiredAt, setAcquiredAt] = useState("");
+  const [endedAt, setEndedAt] = useState("");
   const [cost, setCost] = useState("0.00");
 
   return (
@@ -54,6 +55,18 @@ export function CreateItemDialog() {
             />
           </div>
           <div className="grid gap-2">
+            <Label htmlFor="new-ended">End date</Label>
+            <Input
+              id="new-ended"
+              type="date"
+              value={endedAt}
+              onChange={(e) => setEndedAt(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Leave blank if you still have it.
+            </p>
+          </div>
+          <div className="grid gap-2">
             <Label htmlFor="new-cost">Cost</Label>
             <Input
               id="new-cost"
@@ -73,12 +86,14 @@ export function CreateItemDialog() {
                   await createItem({
                     name,
                     acquiredAt: acquiredAt || undefined,
+                    endedAt: endedAt || undefined,
                     cost,
                   });
                   toast.success("Item created");
                   setOpen(false);
                   setName("");
                   setAcquiredAt("");
+                  setEndedAt("");
                   setCost("0.00");
                 } catch {
                   toast.error("Failed to create item");
