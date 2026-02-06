@@ -87,6 +87,14 @@ export default async function DashboardPage(props: {
             <div className="w-full sm:w-auto">
               <CreateItemDialog />
             </div>
+
+            <Button
+              asChild
+              variant="outline"
+              className="w-full sm:w-auto"
+            >
+              <a href="/dashboard/import">Import</a>
+            </Button>
           </div>
         </div>
 
