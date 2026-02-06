@@ -2,11 +2,11 @@
 
 import { z } from "zod";
 import { and, eq } from "drizzle-orm";
-import { formatISO } from "date-fns";
+// (usage is assumed daily; no date-fns helpers needed here)
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/db";
-import { itemUses, items } from "@/db/schema";
+import { items } from "@/db/schema";
 import { parseMoneyToCents } from "@/lib/money";
 import { requireSession } from "@/lib/session";
 
@@ -78,25 +78,4 @@ export async function deleteItem(input: z.infer<typeof deleteItemSchema>) {
   revalidatePath("/dashboard");
 }
 
-const addUseSchema = z.object({
-  itemId: z.string().uuid(),
-  usedAt: ymd,
-  quantity: z.number().int().min(1).max(100).optional(),
-});
-
-export async function addUse(input: z.infer<typeof addUseSchema>) {
-  const session = await requireSession();
-  const data = addUseSchema.parse(input);
-
-  const usedAt = data.usedAt ?? formatISO(new Date(), { representation: "date" });
-
-  // Redundant userId is intentional: faster filtering + safer joins.
-  await db.insert(itemUses).values({
-    userId: session.user.id,
-    itemId: data.itemId,
-    usedAt,
-    quantity: data.quantity ?? 1,
-  });
-
-  revalidatePath("/dashboard");
-}
+// addUse removed: Holdfolio assumes 1 use per day held.

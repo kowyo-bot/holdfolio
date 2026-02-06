@@ -1,11 +1,11 @@
-import { formatISO } from "date-fns";
+import { differenceInCalendarDays, formatISO } from "date-fns";
 
 import { requireSession } from "@/lib/session";
-import { listItemsWithMetrics, getUsesByDay } from "@/db/queries/dashboard";
+import { listItemsWithMetrics } from "@/db/queries/dashboard";
 import { formatCents } from "@/lib/money";
 import { CreateItemDialog } from "@/components/dashboard/create-item";
 import { ItemsTable, type ItemRow } from "@/components/dashboard/items-table";
-import { UsesChart } from "@/components/dashboard/uses-chart";
+// Uses chart removed
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,26 +23,23 @@ export default async function DashboardPage(props: {
   const searchParams = (await props.searchParams) ?? {};
   const asOf = typeof searchParams.asOf === "string" ? searchParams.asOf : toYmd(new Date());
 
-  const [rows, usesByDay] = await Promise.all([
-    listItemsWithMetrics({ userId: session.user.id, asOfDate: asOf }),
-    getUsesByDay({ userId: session.user.id, asOfDate: asOf, days: 30 }),
-  ]);
+  const rows = await listItemsWithMetrics({ userId: session.user.id, asOfDate: asOf });
+
+  const asOfDateObj = new Date(`${asOf}T00:00:00Z`);
 
   const itemsForTable: ItemRow[] = rows.map((r) => {
     const acquired = r.acquiredAt ? new Date(`${r.acquiredAt}T00:00:00Z`) : null;
     const ended = r.endedAt ? new Date(`${r.endedAt}T00:00:00Z`) : null;
-    const asOfDate = new Date(`${asOf}T00:00:00Z`);
 
-    const effectiveEnd = ended && ended < asOfDate ? ended : asOfDate;
+    const effectiveEnd = ended && ended < asOfDateObj ? ended : asOfDateObj;
 
+    // Assumption: user uses the item every day they hold it.
+    // Inclusive day count: acquiredAt == asOfDate => 1 use.
     const holdingDays = acquired
-      ? Math.max(
-          0,
-          Math.floor((effectiveEnd.getTime() - acquired.getTime()) / (1000 * 60 * 60 * 24))
-        )
+      ? Math.max(0, differenceInCalendarDays(effectiveEnd, acquired) + 1)
       : null;
 
-    const uses = Number(r.uses ?? 0);
+    const uses = holdingDays ?? 0;
     const costPerUseCents = uses > 0 ? Math.round(r.costCents / uses) : null;
 
     return {
@@ -56,6 +53,8 @@ export default async function DashboardPage(props: {
       costPerUseCents,
     };
   });
+
+  // Uses chart removed.
 
   const totalCostCents = itemsForTable.reduce((acc, i) => acc + i.costCents, 0);
   const totalUses = itemsForTable.reduce((acc, i) => acc + i.uses, 0);
@@ -117,11 +116,11 @@ export default async function DashboardPage(props: {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Total uses</CardTitle>
+              <CardTitle>Total uses (assumed daily)</CardTitle>
             </CardHeader>
             <CardContent className="text-2xl font-semibold">{totalUses}</CardContent>
             <p className="px-6 pb-6 text-xs text-muted-foreground">
-              As of {asOf}
+              Assuming 1 use/day held · as of {asOf}
             </p>
           </Card>
           <Card>
@@ -133,15 +132,6 @@ export default async function DashboardPage(props: {
             </CardContent>
           </Card>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Uses (last 30 days)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <UsesChart data={usesByDay} />
-          </CardContent>
-        </Card>
 
         <Separator />
 

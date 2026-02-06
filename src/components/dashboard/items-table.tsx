@@ -9,10 +9,9 @@ import {
 } from "@tanstack/react-table";
 
 type ColMeta = { className?: string };
-import { formatISO } from "date-fns";
 import { toast } from "sonner";
 
-import { addUse, deleteItem, updateItem } from "@/app/actions/items";
+import { deleteItem, updateItem } from "@/app/actions/items";
 import { formatCents } from "@/lib/money";
 import {
   Dialog,
@@ -153,24 +152,7 @@ function RowActions(props: { row: ItemRow }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onClick={() => {
-              startTransition(async () => {
-                try {
-                  await addUse({
-                    itemId: props.row.id,
-                    usedAt: formatISO(new Date(), { representation: "date" }),
-                    quantity: 1,
-                  });
-                  toast.success("Logged 1 use");
-                } catch {
-                  toast.error("Failed to log use");
-                }
-              });
-            }}
-          >
-            Log 1 use today
-          </DropdownMenuItem>
+          {/* Usage is assumed daily. */}
           <DropdownMenuItem
             className="text-red-600"
             onClick={() => {
@@ -217,7 +199,7 @@ export function ItemsTable(props: { data: ItemRow[] }) {
         header: "Holding days",
         meta: { className: "hidden lg:table-cell" } satisfies ColMeta,
       },
-      { accessorKey: "uses", header: "Uses" },
+      { accessorKey: "uses", header: "Uses (assumed)" },
       {
         accessorKey: "costCents",
         header: "Cost",
