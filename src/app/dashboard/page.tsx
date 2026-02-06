@@ -61,11 +61,13 @@ export default async function DashboardPage(props: {
   const avgCostPerUseCents = totalUses > 0 ? Math.round(totalCostCents / totalUses) : null;
 
   return (
-    <div className="min-h-screen p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:p-6 md:p-10">
+    <div className="min-h-screen p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:p-6 md:p-8">
       <div className="mx-auto max-w-6xl grid gap-4 sm:gap-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Holdfolio</h1>
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0 space-y-1">
+            <h1 className="text-2xl font-semibold tracking-tight text-balance">
+              Holdfolio
+            </h1>
             <p className="text-sm text-muted-foreground">
               As-of metrics dashboard for your stuff.
             </p>
@@ -74,16 +76,21 @@ export default async function DashboardPage(props: {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <form
               action="/dashboard"
-              className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-end"
+              className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center"
             >
-              <div className="grid gap-1">
-                <Label htmlFor="asOf" className="text-muted-foreground">
-                  As of
-                </Label>
-                <Input id="asOf" name="asOf" type="date" defaultValue={asOf} />
-              </div>
+              <Label htmlFor="asOf" className="sr-only">
+                As of
+              </Label>
+              <Input
+                id="asOf"
+                name="asOf"
+                type="date"
+                defaultValue={asOf}
+                className="w-full sm:w-[180px] tabular-nums"
+              />
               <Button
                 type="submit"
+                size="sm"
                 variant="outline"
                 className="w-full sm:w-auto"
               >
@@ -97,13 +104,14 @@ export default async function DashboardPage(props: {
 
             <Button
               asChild
+              size="sm"
               variant="outline"
               className="w-full sm:w-auto"
             >
               <a href="/dashboard/import">Import</a>
             </Button>
           </div>
-        </div>
+        </header>
 
         <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
           <Card>

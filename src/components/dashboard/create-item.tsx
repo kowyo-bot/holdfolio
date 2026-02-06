@@ -28,7 +28,7 @@ export function CreateItemDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Add item</Button>
+        <Button size="sm">Add item</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
