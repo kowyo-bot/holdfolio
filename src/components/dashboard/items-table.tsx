@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+
+type ColMeta = { className?: string };
 import {
   ColumnDef,
   flexRender,
@@ -111,7 +113,7 @@ function EditItemDialog(props: { item: ItemRow }) {
                   });
                   toast.success("Item updated");
                   setOpen(false);
-                } catch (e) {
+                } catch {
                   toast.error("Failed to update item");
                 }
               });
@@ -181,18 +183,34 @@ function RowActions(props: { row: ItemRow }) {
 export function ItemsTable(props: { data: ItemRow[] }) {
   const columns = useMemo<ColumnDef<ItemRow>[]>(
     () => [
-      { accessorKey: "name", header: "Item" },
-      { accessorKey: "acquiredAt", header: "Acquired" },
-      { accessorKey: "holdingDays", header: "Holding days" },
+      {
+        accessorKey: "name",
+        header: "Item",
+        meta: {
+          className: "whitespace-normal max-w-[12rem] sm:max-w-none",
+        } satisfies ColMeta,
+      },
+      {
+        accessorKey: "acquiredAt",
+        header: "Acquired",
+        meta: { className: "hidden sm:table-cell" } satisfies ColMeta,
+      },
+      {
+        accessorKey: "holdingDays",
+        header: "Holding days",
+        meta: { className: "hidden md:table-cell" } satisfies ColMeta,
+      },
       { accessorKey: "uses", header: "Uses" },
       {
         accessorKey: "costCents",
         header: "Cost",
+        meta: { className: "hidden sm:table-cell" } satisfies ColMeta,
         cell: ({ row }) => formatCents(row.original.costCents),
       },
       {
         id: "costPerUse",
         header: "Cost / use",
+        meta: { className: "hidden lg:table-cell" } satisfies ColMeta,
         cell: ({ row }) => {
           const v = row.original.costPerUseCents;
           return v == null ? "—" : formatCents(v);
@@ -201,6 +219,7 @@ export function ItemsTable(props: { data: ItemRow[] }) {
       {
         id: "actions",
         header: "",
+        meta: { className: "text-right" } satisfies ColMeta,
         cell: ({ row }) => <RowActions row={row.original} />,
       },
     ],
@@ -220,7 +239,12 @@ export function ItemsTable(props: { data: ItemRow[] }) {
           {table.getHeaderGroups().map((hg) => (
             <TableRow key={hg.id}>
               {hg.headers.map((h) => (
-                <TableHead key={h.id}>
+                <TableHead
+                  key={h.id}
+                  className={
+                    (h.column.columnDef.meta as ColMeta | undefined)?.className
+                  }
+                >
                   {h.isPlaceholder
                     ? null
                     : flexRender(h.column.columnDef.header, h.getContext())}
@@ -234,7 +258,12 @@ export function ItemsTable(props: { data: ItemRow[] }) {
             table.getRowModel().rows.map((r) => (
               <TableRow key={r.id}>
                 {r.getVisibleCells().map((c) => (
-                  <TableCell key={c.id}>
+                  <TableCell
+                    key={c.id}
+                    className={
+                      (c.column.columnDef.meta as ColMeta | undefined)?.className
+                    }
+                  >
                     {flexRender(c.column.columnDef.cell, c.getContext())}
                   </TableCell>
                 ))}

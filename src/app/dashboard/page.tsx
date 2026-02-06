@@ -6,7 +6,10 @@ import { formatCents } from "@/lib/money";
 import { CreateItemDialog } from "@/components/dashboard/create-item";
 import { ItemsTable, type ItemRow } from "@/components/dashboard/items-table";
 import { UsesChart } from "@/components/dashboard/uses-chart";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
 function toYmd(date: Date) {
@@ -51,38 +54,43 @@ export default async function DashboardPage(props: {
   const avgCostPerUseCents = totalUses > 0 ? Math.round(totalCostCents / totalUses) : null;
 
   return (
-    <div className="min-h-screen p-6 md:p-10">
-      <div className="mx-auto max-w-6xl grid gap-6">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div>
+    <div className="min-h-screen p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:p-6 md:p-10">
+      <div className="mx-auto max-w-6xl grid gap-4 sm:gap-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="space-y-1">
             <h1 className="text-2xl font-semibold tracking-tight">Holdfolio</h1>
             <p className="text-sm text-muted-foreground">
               As-of metrics dashboard for your stuff.
             </p>
           </div>
 
-          <div className="flex flex-col gap-2 md:flex-row md:items-center">
-            <form action="/dashboard" className="flex items-center gap-2">
-              <label className="text-sm text-muted-foreground" htmlFor="asOf">
-                As of
-              </label>
-              <input
-                id="asOf"
-                name="asOf"
-                type="date"
-                defaultValue={asOf}
-                className="h-9 rounded-md border bg-background px-3 text-sm"
-              />
-              <button className="h-9 rounded-md border px-3 text-sm hover:bg-accent" type="submit">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <form
+              action="/dashboard"
+              className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-end"
+            >
+              <div className="grid gap-1">
+                <Label htmlFor="asOf" className="text-muted-foreground">
+                  As of
+                </Label>
+                <Input id="asOf" name="asOf" type="date" defaultValue={asOf} />
+              </div>
+              <Button
+                type="submit"
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
                 Apply
-              </button>
+              </Button>
             </form>
 
-            <CreateItemDialog />
+            <div className="w-full sm:w-auto">
+              <CreateItemDialog />
+            </div>
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
           <Card>
             <CardHeader>
               <CardTitle>Total cost</CardTitle>
@@ -93,9 +101,12 @@ export default async function DashboardPage(props: {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Total uses (as of {asOf})</CardTitle>
+              <CardTitle>Total uses</CardTitle>
             </CardHeader>
             <CardContent className="text-2xl font-semibold">{totalUses}</CardContent>
+            <p className="px-6 pb-6 text-xs text-muted-foreground">
+              As of {asOf}
+            </p>
           </Card>
           <Card>
             <CardHeader>
